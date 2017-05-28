@@ -1,8 +1,8 @@
-﻿using System; /////////////////////////////////////////////////
-using System.Collections.Generic;///// Консольный стандарт ////
-using System.Text;/////////////////////////////////////////////
-using System.Net.Sockets; // Вот он, родимый коллекшн классов /
-using System.Threading; // Коллекшн для работы с потоками /////
+﻿using System; 
+using System.Collections.Generic;
+using System.Text;
+using System.Net.Sockets; 
+using System.Threading; 
 
 namespace tcpserver
 {
@@ -14,38 +14,34 @@ namespace tcpserver
             Console.Write("Port to listen: ");
             int port = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Creating server...");
-            Server Serv = new Server(); // Создаем новый экземпляр класса 
-                                        // сервера
+            Server Serv = new Server(); 
             Serv.Create(port);
 
             while (true)
             {
-                cmd = Console.ReadLine(); // Ждем фразы EXIT когда 
-                                          // понадобится выйти из приложения.
-                                          // типа интерактивность.
+                cmd = Console.ReadLine(); 
                 if (cmd == "EXIT")
                 {
-                    Serv.Close(); // раз выход – значит выход. Серв-нах.
+                    Serv.Close(); 
                     return;
                 }
             }
         }
 
-        public class Server // класс сервера.
+        public class Server 
         {
             private int LocalPort;
-            private Thread ServThread; // экземпляр потока
-            TcpListener Listener; // листенер))))
+            private Thread ServThread; 
+            TcpListener Listener; 
 
             public void Create(int port)
             {
                 LocalPort = port;
                 ServThread = new Thread(new ThreadStart(ServStart));
-                ServThread.Start(); // запустили поток. Стартовая функция – 
-                                    // ServStart, как видно выше
+                ServThread.Start(); 
             }
 
-            public void Close() // Закрыть серв?
+            public void Close() 
             {
                 Listener.Stop();
                 ServThread.Abort();
@@ -54,20 +50,19 @@ namespace tcpserver
 
             private void ServStart()
             {
-                Socket ClientSock; // сокет для обмена данными.
+                Socket ClientSock; 
                 string data;
-                byte[] cldata = new byte[1024]; // буфер данных
+                byte[] cldata = new byte[1024]; 
                 Listener = new TcpListener(LocalPort);
-                Listener.Start(); // начали слушать
+                Listener.Start(); 
                 Console.WriteLine("Waiting connections [" + Convert.ToString(LocalPort) + "]...");
                 try
                 {
-                    ClientSock = Listener.AcceptSocket(); // пробуем принять 
-                                                          // клиента
+                    ClientSock = Listener.AcceptSocket(); 
                 }
                 catch
                 {
-                    ServThread.Abort(); // нет – жаль(
+                    ServThread.Abort(); 
                     return;
                 }
                 int i = 0;
@@ -82,7 +77,7 @@ namespace tcpserver
                             cldata[index] = 0;
                             try
                             {
-                                i = ClientSock.Receive(cldata); // попытка чтения 
+                                i = ClientSock.Receive(cldata);
                             }
                             catch
                             {
@@ -94,8 +89,7 @@ namespace tcpserver
                                 {
                                     data = Encoding.ASCII.GetString(cldata, 0, i).Trim();
                                     Console.WriteLine("<" + data);
-                                    if (data == "CLOSE") // если CLOSE – 
-                                                         // вырубимся
+                                    if (data == "CLOSE") 
                                     {
                                         ClientSock.Send(Encoding.ASCII.GetBytes("Closing the server..."));
                                         ClientSock.Close();
@@ -105,7 +99,7 @@ namespace tcpserver
                                         return;
                                     }
                                     else
-                                    { // нет – шлем данные взад.
+                                    { 
                                         StringBuilder sb = new StringBuilder();
                                         for (int index = data.Length - 1; index >= 0; index--)
                                             sb.Append(data[index]);
@@ -117,7 +111,7 @@ namespace tcpserver
                             }
                             catch
                             {
-                                ClientSock.Close(); // ну эт если какая хрень..
+                                ClientSock.Close(); 
                                 Listener.Stop();
                                 Console.WriteLine("Server closing. Reason: client offline. Type EXIT to quit the application.");
                                 ServThread.Abort();
