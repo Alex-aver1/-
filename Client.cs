@@ -32,7 +32,7 @@ namespace Examples
                
                 Console.WriteLine("Enter the message: \n");
                 string requestText = Console.ReadLine();
-                Console.WriteLine("Sending {0}…", requestText);
+                Console.WriteLine("Sending {0}â€¦", requestText);
                 Console.WriteLine();
 
                 // Send
